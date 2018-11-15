@@ -20,7 +20,7 @@ CAMPAIGNS_DIVS_CLASS   = 'js-react-proj-card'
 CAMPAIGNS_DIVS_ATTRS   = {'class': CAMPAIGNS_DIVS_CLASS}
 
 MAIN_TEMPLATE                = 'campaigns.html'
-EXAGGERATED_TEMPLATE         = 'user_exaggerated.html"
+EXAGGERATED_TEMPLATE         = 'user_exaggerated.html'
 CAMPAIGNS_NOT_FOUND_TEMPLATE = 'campaigns_not_found.html'
 
 
