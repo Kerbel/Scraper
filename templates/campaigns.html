@@ -1,0 +1,63 @@
+<html>
+<head>
+  <title>
+    Kickstarter campaign scraper
+  </title>
+  <link rel="icon"
+        type="image/png"
+        href="https://d3mlfyygrfdi2i.cloudfront.net/favicon.png?v=2">
+<script>
+function searchCampaignByTime(hours_earlier) {
+        var uri = "/" + hours_earlier
+        window.location.replace(uri);
+}
+
+function initializeHoursPicker(){
+        selectElment = document.getElementById('selectHoursAmount');
+
+        for (var i = 1; i<={{ max_hours_earlier }}; i++){
+          var option = document.createElement('option');
+          option.value = i;
+          option.innerHTML = i;
+          if (parseInt(window.location.pathname.substring(1)) == i){
+            option.selected = true;
+          }
+          selectElment.appendChild(option);
+        }
+
+        selectElment.addEventListener('change',
+                                       e =>
+                                       searchCampaignByTime(e.target.value))
+}
+
+document.addEventListener("DOMContentLoaded", initializeHoursPicker)
+</script>
+</head>
+<body>
+  <table>
+    <tr>
+        <h3>Hours to lookup back in the history: </h3>
+    </tr>
+    <tr>
+        <select id="selectHoursAmount" />
+    </tr>
+  </table>
+  <table>
+    <tr>
+      <th></th>
+      <th>Name</th>
+      <th>Bakers</th>
+      <th>Money raised</th>
+    </tr>
+    {% for record in records %}
+    {% set campaign = record.campaign %}
+    <tr>
+      <td><img src={{ campaign.thumbnail_url }} /></td>
+      <td>{{ campaign.name }}</td>
+      <td>{{ campaign.backers }}</td>
+      <td>{{ campaign.money_raised }} {{ campaign.currency }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>
