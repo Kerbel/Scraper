@@ -8,25 +8,25 @@ import atexit
 import json
 
 
-DB_PATH = 'campagins.sqlite'
-PAGE_TO_SCRAPE = "https://www.kickstarter.com/discover/popular"
+DB_PATH        = 'campagins.sqlite'
+PAGE_TO_SCRAPE = 'https://www.kickstarter.com/discover/popular'
 
-MAX_HOURS_EARLIER = 24
+MAX_HOURS_EARLIER         = 24
 CAMPAIGNS_AMOUNT_TO_FETCH = 10
 FETCH_INTERVAL_IN_SECONDS = 60 * 60
 
-CAMPAIGN_DIV_JSON_ATTR = "data-project"
-CAMPAIGNS_DIVS_CLASS = 'js-react-proj-card'
-CAMPAIGNS_DIVS_ATTRS={'class': CAMPAIGNS_DIVS_CLASS}
+CAMPAIGN_DIV_JSON_ATTR = 'data-project'
+CAMPAIGNS_DIVS_CLASS   = 'js-react-proj-card'
+CAMPAIGNS_DIVS_ATTRS   = {'class': CAMPAIGNS_DIVS_CLASS}
 
-MAIN_TEMPLATE = "campaigns.html"
-EXAGGERATED_TEMPLATE = "user_exaggerated.html"
-CAMPAIGNS_NOT_FOUND_TEMPLATE = "campaigns_not_found.html"
+MAIN_TEMPLATE                = 'campaigns.html'
+EXAGGERATED_TEMPLATE         = 'user_exaggerated.html"
+CAMPAIGNS_NOT_FOUND_TEMPLATE = 'campaigns_not_found.html'
 
 
 app = Flask(__name__)
 scheduler = BackgroundScheduler()
-database = SqliteDatabase(DB_PATH, pragmas={'foreign_keys': 1})
+database = SqliteDatabase(DB_PATH, pragmas = {'foreign_keys': 1})
 
 
 class BaseModel(Model):
@@ -35,18 +35,18 @@ class BaseModel(Model):
 
 
 class Campaign(BaseModel):
-    campaign_id = IntegerField(primary_key=True, unique=True)
-    name = TextField()
+    campaign_id   = IntegerField(primary_key = True, unique = True)
+    name          = TextField()
     thumbnail_url = TextField()
-    backers = TextField()
-    money_raised = TextField()
-    currency = TextField()
+    backers       = IntegerField()
+    money_raised  = IntegerField()
+    currency      = TextField()
 
 
 class PopularityHistory(BaseModel):
-    id = AutoField()
-    timestamp = DateTimeField("%Y-%m-%d %H:%M:%S")
-    campaign = ForeignKeyField(Campaign)
+    id        = AutoField()
+    timestamp = DateTimeField('%Y-%m-%d %H:%M:%S')
+    campaign  = ForeignKeyField(Campaign)
 
 
 def create_database():
@@ -57,19 +57,19 @@ def create_database():
 def insert_campaign_object(campaign):
     try:
         with database.atomic():
-            Campaign.create(campaign_id   = campaign["id"],
-                            name          = campaign["name"],
-                            thumbnail_url = campaign["photo"]["thumb"],
-                            backers       = campaign["backers_count"],
-                            money_raised  = campaign["pledged"],
-                            currency      = campaign["currency"])
+            Campaign.create(campaign_id   = campaign['id'],
+                            name          = campaign['name'],
+                            thumbnail_url = campaign['photo']['thumb'],
+                            backers       = campaign['backers_count'],
+                            money_raised  = campaign['pledged'],
+                            currency      = campaign['currency'])
 
     except IntegrityError:
         database.rollback()
 
     except Exception as e:
         database.rollback()
-        print("There was an error:", e)
+        print('There was an error:', e)
 
 
 def insert_popularity_history_record(campaign_id):
@@ -77,12 +77,12 @@ def insert_popularity_history_record(campaign_id):
         with database.atomic():
             PopularityHistory.create(
                 timestamp = datetime.now(),
-                campaign = campaign_id
+                campaign  = campaign_id
             )
 
     except Exception as e:
         database.rollback()
-        print("There was an error:", e)
+        print('There was an error:', e)
 
 
 def scrape_divs_from_page(url, attrs_to_search):
@@ -109,12 +109,12 @@ def download_campaigns():
 
     for campaign in campaigns:
         insert_campaign_object(campaign)
-        insert_popularity_history_record(campaign["id"])
+        insert_popularity_history_record(campaign['id'])
 
 
 def schedule_download():
     scheduler.add_job(func    = download_campaigns,
-                      trigger = "interval",
+                      trigger = 'interval',
                       seconds = FETCH_INTERVAL_IN_SECONDS)
 
 
@@ -131,11 +131,11 @@ def get_records_by_time(hours_earlier):
 
 @app.route('/')
 @app.route('/<int:hours_earlier>')
-def render_relevant_template(hours_earlier=1):
+def render_relevant_template(hours_earlier = 1):
     if hours_earlier > MAX_HOURS_EARLIER:
         return render_template(
                     EXAGGERATED_TEMPLATE,
-                    max_hours_earlier=MAX_HOURS_EARLIER)
+                    max_hours_earlier = MAX_HOURS_EARLIER)
 
     popularity_history_records = get_records_by_time(hours_earlier)
 
@@ -147,7 +147,7 @@ def render_relevant_template(hours_earlier=1):
 
     return render_template(
             CAMPAIGNS_NOT_FOUND_TEMPLATE,
-            hours_earlier=hours_earlier)
+            hours_earlier = hours_earlier)
 
 
 @app.before_first_request
