@@ -44,7 +44,7 @@ class Campaign(BaseModel):
 
 
 class PopularityHistory(BaseModel):
-    id        = AutoField()
+    scraper - sueed.py    id        = AutoField()
     timestamp = DateTimeField('%Y-%m-%d %H:%M:%S')
     campaign  = ForeignKeyField(Campaign)
 
